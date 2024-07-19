@@ -1,0 +1,46 @@
+package MultiThreading;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
+import java.net.Socket;
+
+public class RequestHandler implements Runnable{
+	   private final Socket clientSocket;
+
+	    public RequestHandler(Socket socket) {
+	        this.clientSocket = socket;
+	    }
+
+	    @Override
+	    public void run() {
+	        try (BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+	             PrintWriter out = new PrintWriter(clientSocket.getOutputStream(), true)) {
+
+	            String requestLine;
+	            while ((requestLine = in.readLine()) != null && !requestLine.isEmpty()) {
+	                System.out.println("Request: " + requestLine);
+	                
+	             System.out.println("HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\n\r\nHello World!");
+	                break;  
+	            }
+
+	        } catch (IOException e) {
+	            e.printStackTrace();
+	        }
+	    
+	    try {
+	        // Code that might throw an exception
+	    } catch (Exception e) {
+	        System.err.println("Unexpected error: " + e.getMessage());
+	    }
+	    try {
+	        
+	    } catch (Exception e) {
+	        System.err.println("Unexpected error: " + e.getMessage());
+	    }
+}
+	   
+}
+

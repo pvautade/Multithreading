@@ -1,0 +1,46 @@
+package MultiThreading;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
+public class MultiThreadedWebServer {
+	private static final int PORT = 8080;
+    private final ExecutorService threadPool;
+
+    public MultiThreadedWebServer(int poolSize) {
+        threadPool = Executors.newFixedThreadPool(poolSize);
+    }
+
+    public void start() {
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            while (true) {
+                Socket clientSocket = serverSocket.accept();
+                threadPool.submit(new RequestHandler(clientSocket));
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            shutdown();
+        }
+    }
+
+    private void shutdown() {
+        threadPool.shutdown();
+        try {
+            if (!threadPool.awaitTermination(60, TimeUnit.SECONDS)) {
+                threadPool.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            threadPool.shutdownNow();
+        }
+    }
+
+    public static void main(String[] args) {
+        MultiThreadedWebServer server = new MultiThreadedWebServer(10); 
+        server.start();
+    }
+}
